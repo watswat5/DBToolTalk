@@ -1,0 +1,5 @@
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=<your username, default is postgres>
+POSTGRES_PASSWORD<your passwd>>
+POSTGRES_DATABASE=<your db here>>
