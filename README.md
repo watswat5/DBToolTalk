@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js + PostgreSQL Example
 
-## Getting Started
+A simple tutorial project showing how to connect a Next.js app to a PostgreSQL database using the `pg` library.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Copy `exampleenv.txt` to `.env.local`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   **macOS/Linux:**
+   ```bash
+   cp exampleenv.txt .env.local
+   ```
+   **Windows (Command Prompt):**
+   ```cmd
+   copy exampleenv.txt .env.local
+   ```
+   **Windows (PowerShell):**
+   ```powershell
+   Copy-Item exampleenv.txt .env.local
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   Then fill in your database credentials:
+   ```
+   POSTGRES_HOST=localhost
+   POSTGRES_PORT=5432
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=yourpassword
+   POSTGRES_DATABASE=yourdb
+   ```
 
-## Learn More
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+## How It Works
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**`lib/db.ts`** — Creates a connection pool using environment variables. Import `pool` anywhere you need to query the database.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**`app/api/customer/route.ts`** — Demonstrates:
+- `GET /api/customer` — fetch all customers
+- `GET /api/customer?name=John` — filter by query parameter
+- `POST /api/customer` — insert a new customer
 
-## Deploy on Vercel
+**`app/api/customer/[id]/route.ts`** — Demonstrates dynamic route parameters:
+- `GET /api/customer/John` — fetch a customer by name via URL segment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Key Concepts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Connection pooling**: `new Pool(...)` in `lib/db.ts` reuses connections efficiently.
+- **Parameterized queries**: Use `$1`, `$2`, etc. to safely pass user input — this prevents SQL injection.
+- **Route handlers**: Next.js App Router uses `route.ts` files to define API endpoints.
+- **Dynamic routes**: Folders named `[param]` create URL segments you can read from `context.params`.
