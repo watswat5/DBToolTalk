@@ -14,7 +14,7 @@ export async function GET(_request: Request) {
     try {
         if(name) {
             const result = await pool.query(
-                "SELECT * FROM customer WHERE cname = $1 ORDER BY cname",
+                "SELECT * FROM customer WHERE cname = $1 ORDER BY cname LIMIT 10",
                 [name] //Queries use $ to reference variables, i.e. $1, $2, $3.
                 //All the needed variables are passed in an array as the second argument to the query function.
             );
@@ -35,6 +35,30 @@ export async function GET(_request: Request) {
 
         return Response.json(
             { error: "Failed to retrieve customers" },
+            { status: 500 }
+        );
+    }
+}
+
+export async function POST(_request: Request) {
+    try {
+
+        //The body has the JSON object that was sent in the request. You can access it like this:
+        const body = await _request.json();
+        console.log("Received body:", body);
+        const { cname, street, ccity } = body;
+
+        const result = await pool.query(
+            "INSERT INTO customer (cname, street, ccity) VALUES ($1, $2, $3) RETURNING *",
+            [cname, street, ccity]
+        );
+
+        return Response.json(result.rows[0]);
+    } catch (error) {
+        console.error("Database error:", error);
+
+        return Response.json(
+            { error: "Failed to create customer" },
             { status: 500 }
         );
     }
