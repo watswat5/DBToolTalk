@@ -12,16 +12,24 @@ export async function GET(_request: Request) {
 
     //Here, you can run a query on the postgres db
     try {
-        const result = await pool.query(
-            "SELECT * FROM customer WHERE cname = $1 ORDER BY cname",
-            [name] //Queries use $ to reference variables, i.e. $1, $2, $3.
-            //All the needed variables are passed in an array as the second argument to the query function.
-        );
+        if(name) {
+            const result = await pool.query(
+                "SELECT * FROM customer WHERE cname = $1 ORDER BY cname",
+                [name] //Queries use $ to reference variables, i.e. $1, $2, $3.
+                //All the needed variables are passed in an array as the second argument to the query function.
+            );
 
-        //Queries are stored server-side, and only parameters are passed by the user.
-        //This protects against SQL injection attacks.
-        
-        return Response.json(result.rows);
+            //Queries are stored server-side, and only parameters are passed by the user.
+            //This protects against SQL injection attacks.
+
+            return Response.json(result.rows);
+        } else {
+            const result = await pool.query(
+                "SELECT * FROM customer ORDER BY cname"
+            );
+
+            return Response.json(result.rows);
+        }
     } catch (error) {
         console.error("Database error:", error);
 
